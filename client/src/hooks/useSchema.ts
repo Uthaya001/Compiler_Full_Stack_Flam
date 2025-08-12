@@ -11,6 +11,7 @@ export interface SchemaField {
   max?: number;
 }
 
+
 export interface FormSchema {
   type: 'form';
   title: string;
