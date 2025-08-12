@@ -2,6 +2,7 @@ import { type User, type InsertUser } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
+
 // you might need
 
 export interface IStorage {
