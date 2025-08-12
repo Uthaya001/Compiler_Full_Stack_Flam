@@ -1,0 +1,501 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Interface Compiler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'editor-bg': '#1e1e1e',
+                        'editor-border': '#3e3e42',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- @COMPONENT: App [main application container] -->
+    <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <!-- @COMPONENT: Header [application title and export controls] -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-code text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold text-gray-900">Dynamic Interface Compiler</h1>
+                        <p class="text-sm text-gray-500">Build UI components with JSON schemas</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <!-- @FUNCTIONALITY: Theme toggle between light and dark mode -->
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" data-implementation="Toggle theme state">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <!-- @FUNCTIONALITY: Export schema as JSON file download -->
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors" data-event="click:exportSchema">
+                        <i class="fas fa-download"></i>
+                        <span>Export Schema</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: Header -->
+
+        <!-- Main Content Area -->
+        <div class="flex h-[calc(100vh-80px)]">
+            <!-- Schema Editor Panel -->
+            <!-- @COMPONENT: SchemaEditor [JSON schema editing with Monaco Editor] -->
+            <div class="w-1/2 border-r border-gray-200 bg-white flex flex-col">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-900 flex items-center space-x-2">
+                            <i class="fas fa-edit text-blue-500"></i>
+                            <span>Schema Editor</span>
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <!-- @FUNCTIONALITY: Schema validation indicator -->
+                            <div class="flex items-center space-x-1 text-sm" data-bind="validationStatus">
+                                <div class="w-2 h-2 bg-green-500 rounded-full" data-mock="true"></div>
+                                <span class="text-green-600">Valid JSON</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monaco Editor Container -->
+                <div class="flex-1 relative">
+                    <!-- @FUNCTIONALITY: Monaco Editor integration for JSON schema editing -->
+                    <div class="absolute inset-0 bg-editor-bg text-white p-4 font-mono text-sm overflow-auto" data-implementation="Replace with Monaco Editor component">
+                        <div class="text-gray-400 mb-2"><!-- JSON Schema --></div>
+                        <pre class="text-white leading-relaxed"><code data-mock="true">{
+  "type": "form",
+  "title": "User Registration",
+  "fields": [
+    {
+      "label": "Full Name",
+      "type": "text",
+      "name": "fullName",
+      "required": true,
+      "placeholder": "Enter your full name"
+    },
+    {
+      "label": "Email Address",
+      "type": "email", 
+      "name": "email",
+      "required": true,
+      "placeholder": "your@email.com"
+    },
+    {
+      "label": "Age",
+      "type": "number",
+      "name": "age", 
+      "min": 18,
+      "max": 100,
+      "required": true
+    },
+    {
+      "label": "Bio",
+      "type": "textarea",
+      "name": "bio",
+      "placeholder": "Tell us about yourself..."
+    }
+  ],
+  "submitText": "Create Account",
+  "onSubmit": "if (values.age < 21) return 'Must be 21 or older'; return 'success';"
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Schema Templates -->
+                <div class="border-t border-gray-200 p-4 bg-gray-50">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium text-gray-700">Quick Templates</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <!-- @FUNCTIONALITY: Load predefined schema templates -->
+                        <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200 transition-colors" data-event="click:loadTemplate" data-template="form">
+                            Form
+                        </button>
+                        <button class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200 transition-colors" data-event="click:loadTemplate" data-template="text">
+                            Text
+                        </button>
+                        <button class="px-3 py-1 bg-purple-100 text-purple-700 rounded text-xs hover:bg-purple-200 transition-colors" data-event="click:loadTemplate" data-template="image">
+                            Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: SchemaEditor -->
+
+            <!-- Live Renderer Panel -->
+            <!-- @COMPONENT: LiveRenderer [real-time component rendering based on schema] -->
+            <div class="w-1/2 bg-white flex flex-col">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h2 class="text-lg font-medium text-gray-900 flex items-center space-x-2">
+                        <i class="fas fa-eye text-green-500"></i>
+                        <span>Live Preview</span>
+                    </h2>
+                </div>
+
+                <!-- Rendered Component Container -->
+                <div class="flex-1 p-6 overflow-auto">
+                    <!-- @COMPONENT: FormBlock [dynamically rendered form component] -->
+                    <div class="max-w-md mx-auto" data-mock="true">
+                        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6" data-bind="schema.title">User Registration</h3>
+                            
+                            <!-- @FUNCTIONALITY: Form with react-hook-form validation -->
+                            <form class="space-y-4" data-implementation="Implement with react-hook-form">
+                                <!-- @MAP: schema.fields.map(field => ( -->
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700" data-bind="field.label">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        placeholder="Enter your full name"
+                                        data-bind="field.placeholder"
+                                        data-mock="true"
+                                    />
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700" data-bind="field.label">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        placeholder="your@email.com"
+                                        data-bind="field.placeholder"
+                                        data-mock="true"
+                                    />
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700" data-bind="field.label">Age</label>
+                                    <input 
+                                        type="number" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        min="18"
+                                        max="100"
+                                        data-bind="field.min,field.max"
+                                        data-mock="true"
+                                    />
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700" data-bind="field.label">Bio</label>
+                                    <textarea 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                                        rows="3"
+                                        placeholder="Tell us about yourself..."
+                                        data-bind="field.placeholder"
+                                        data-mock="true"
+                                    ></textarea>
+                                </div>
+                                <!-- @END_MAP )) -->
+
+                                <!-- Submit Button -->
+                                <button 
+                                    type="submit" 
+                                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                    data-bind="schema.submitText"
+                                    data-event="click:handleSubmit"
+                                    data-implementation="Execute schema.onSubmit logic with sandboxExecutor"
+                                >
+                                    Create Account
+                                </button>
+
+                                <!-- @FUNCTIONALITY: Dynamic error/success messages from custom logic -->
+                                <!-- @STATE: submissionResult:string = null -->
+                                <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 hidden" data-bind="submissionResult.error" data-implementation="Show when custom logic returns error">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    Must be 21 or older
+                                </div>
+
+                                <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 hidden" data-bind="submissionResult.success" data-implementation="Show when custom logic returns success">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    Account created successfully!
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: FormBlock -->
+                </div>
+
+                <!-- Renderer Status -->
+                <div class="border-t border-gray-200 p-4 bg-gray-50">
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span class="text-gray-600">Rendered: FormBlock</span>
+                        </div>
+                        <span class="text-gray-500" data-bind="lastUpdated">Last updated: 2s ago</span>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: LiveRenderer -->
+        </div>
+
+        <!-- Component Library Panel (Optional Bonus Feature) -->
+        <!-- @COMPONENT: ComponentLibrary [drag-and-drop component library] -->
+        <div class="fixed bottom-6 right-6 bg-white rounded-xl shadow-lg border border-gray-200 p-4 w-80 hidden" data-implementation="Optional: Show when drag-and-drop is enabled">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-medium text-gray-900">Component Library</h3>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-2">
+                <!-- @FUNCTIONALITY: Draggable component blocks for layout building -->
+                <div class="border border-gray-200 rounded-lg p-3 cursor-move hover:bg-gray-50 transition-colors" draggable="true" data-component="form">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-mb-3 text-blue-500"></i>
+                        <span class="text-sm font-medium">Form Block</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Interactive form with validation</p>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-3 cursor-move hover:bg-gray-50 transition-colors" draggable="true" data-component="text">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-font text-green-500"></i>
+                        <span class="text-sm font-medium">Text Block</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Rich text content</p>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-3 cursor-move hover:bg-gray-50 transition-colors" draggable="true" data-component="image">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-image text-purple-500"></i>
+                        <span class="text-sm font-medium">Image Block</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Image with caption</p>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ComponentLibrary -->
+
+        <!-- Additional Component Examples (Hidden, shown when different schemas are loaded) -->
+        
+        <!-- @COMPONENT: TextBlock [example of text component rendering] -->
+        <div class="hidden max-w-2xl mx-auto p-6" data-component-type="text" data-mock="true">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4" data-bind="schema.title">Welcome to Our Platform</h2>
+                <div class="prose prose-gray max-w-none" data-bind="schema.content">
+                    <p class="text-gray-600 leading-relaxed">
+                        This is a dynamically rendered text block component. It supports rich text content with proper typography and spacing. You can customize the title, content, and styling through the JSON schema.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mt-4">
+                        The component automatically handles responsive design and maintains consistent spacing with other UI elements.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: TextBlock -->
+
+        <!-- @COMPONENT: ImageBlock [example of image component rendering] -->
+        <div class="hidden max-w-xl mx-auto p-6" data-component-type="image" data-mock="true">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <!-- Modern workspace setup with laptop, plants and coffee -->
+                <img 
+                    src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=500" 
+                    alt="Modern workspace" 
+                    class="w-full h-64 object-cover"
+                    data-bind="schema.src,schema.alt"
+                    data-mock-image="true"
+                />
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2" data-bind="schema.title">Modern Workspace</h3>
+                    <p class="text-gray-600 text-sm" data-bind="schema.caption">
+                        A clean and organized workspace setup that promotes productivity and creativity.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ImageBlock -->
+    </div>
+    <!-- @END_COMPONENT: App -->
+
+    <script>
+        // TODO: Implement Zustand store for schema state management
+        // TODO: Implement Monaco Editor integration for JSON editing
+        // TODO: Implement safe Function constructor for custom logic execution
+        // TODO: Implement real-time schema validation and component rendering
+        // TODO: Implement localStorage persistence for schema state
+        // TODO: Implement export functionality for schema download
+        // TODO: Optional: Implement drag-and-drop layout building with dnd-kit
+
+        (() => {
+            // Mock functionality for demonstration
+            console.log('Dynamic Interface Compiler loaded');
+            
+            // Mock validation status update
+            const validationStatus = document.querySelector('[data-bind="validationStatus"]');
+            if (validationStatus) {
+                // Simulate real-time validation feedback
+                setInterval(() => {
+                    const indicator = validationStatus.querySelector('.w-2');
+                    const text = validationStatus.querySelector('span');
+                    
+                    // Mock validation state changes
+                    const isValid = Math.random() > 0.2; // 80% valid
+                    
+                    if (isValid) {
+                        indicator.className = 'w-2 h-2 bg-green-500 rounded-full';
+                        text.textContent = 'Valid JSON';
+                        text.className = 'text-green-600';
+                    } else {
+                        indicator.className = 'w-2 h-2 bg-red-500 rounded-full';
+                        text.textContent = 'Invalid JSON';
+                        text.className = 'text-red-600';
+                    }
+                }, 5000);
+            }
+
+            // Mock last updated timestamp
+            const lastUpdated = document.querySelector('[data-bind="lastUpdated"]');
+            if (lastUpdated) {
+                let seconds = 2;
+                setInterval(() => {
+                    lastUpdated.textContent = `Last updated: ${seconds}s ago`;
+                    seconds += 1;
+                }, 1000);
+            }
+
+            // Mock form submission with custom logic execution
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Mock values for demonstration
+                    const mockValues = {
+                        fullName: 'John Doe',
+                        email: 'john@example.com',
+                        age: 19, // Will trigger age validation error
+                        bio: 'Software developer'
+                    };
+
+                    // Mock custom logic execution (schema.onSubmit)
+                    const customLogic = "if (values.age < 21) return 'Must be 21 or older'; return 'success';";
+                    
+                    try {
+                        // Safe Function constructor execution (not eval)
+                        const executeLogic = new Function('values', `return (${customLogic})`);
+                        const result = executeLogic(mockValues);
+                        
+                        // Show appropriate message based on result
+                        const errorDiv = document.querySelector('[data-bind="submissionResult.error"]');
+                        const successDiv = document.querySelector('[data-bind="submissionResult.success"]');
+                        
+                        if (result === 'success') {
+                            errorDiv.classList.add('hidden');
+                            successDiv.classList.remove('hidden');
+                            console.log('Form submission successful:', mockValues);
+                        } else {
+                            successDiv.classList.add('hidden');
+                            errorDiv.classList.remove('hidden');
+                            errorDiv.querySelector('span:last-child').textContent = result;
+                            console.log('Form submission error:', result);
+                        }
+                    } catch (error) {
+                        console.error('Error executing custom logic:', error);
+                    }
+                });
+            }
+
+            // Mock export functionality
+            const exportBtn = document.querySelector('[data-event="click:exportSchema"]');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    const mockSchema = {
+                        type: "form",
+                        title: "User Registration",
+                        fields: [
+                            {
+                                label: "Full Name",
+                                type: "text",
+                                name: "fullName",
+                                required: true,
+                                placeholder: "Enter your full name"
+                            },
+                            {
+                                label: "Email Address",
+                                type: "email",
+                                name: "email",
+                                required: true,
+                                placeholder: "your@email.com"
+                            }
+                        ],
+                        submitText: "Create Account",
+                        onSubmit: "if (values.age < 21) return 'Must be 21 or older'; return 'success';"
+                    };
+
+                    const dataStr = JSON.stringify(mockSchema, null, 2);
+                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                    const url = URL.createObjectURL(dataBlob);
+                    
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'schema.json';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    console.log('Schema exported successfully');
+                });
+            }
+
+            // Mock template loading
+            const templateBtns = document.querySelectorAll('[data-event="click:loadTemplate"]');
+            templateBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const template = btn.getAttribute('data-template');
+                    console.log(`Loading ${template} template`);
+                    
+                    // Mock template schemas
+                    const templates = {
+                        form: {
+                            type: "form",
+                            title: "Contact Form",
+                            fields: [
+                                { label: "Name", type: "text", name: "name", required: true },
+                                { label: "Email", type: "email", name: "email", required: true },
+                                { label: "Message", type: "textarea", name: "message", required: true }
+                            ],
+                            submitText: "Send Message"
+                        },
+                        text: {
+                            type: "text",
+                            title: "About Us",
+                            content: "This is a sample text block with rich content."
+                        },
+                        image: {
+                            type: "image",
+                            title: "Feature Image",
+                            src: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc",
+                            alt: "Sample image",
+                            caption: "This is a sample image caption."
+                        }
+                    };
+                    
+                    // In real implementation, this would update the Monaco Editor content
+                    console.log('Template loaded:', templates[template]);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
